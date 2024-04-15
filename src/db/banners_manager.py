@@ -6,7 +6,9 @@ from datetime import datetime, timedelta
 
 class BannerManager:
     def __init__(self, client, db):
-        url = "mongodb://localhost:27017"
+        # server db URL: "mongodb://mongodb:27017"
+        # test db URL: "mongodb://localhost:27017"
+        url = "mongodb://mongodb:27017"
         self.client = motor.motor_asyncio.AsyncIOMotorClient(url)
         self.db = self.client[client]
         self.banners = self.db[db]

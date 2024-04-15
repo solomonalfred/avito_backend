@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data
+
+  api:
+    container_name: banner_service
+    image: banner_service
+    build:
+      context: ./
+      dockerfile: "docker/Dockerfile"
+    ports:
+      - "7777:7777"
+    restart: always
+    environment:
+        DB_HOST: postgres
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASS: ${DB_PASS}
+        DB_PORT: ${DB_PORT}
+
+volumes:
+  postgres_data:
