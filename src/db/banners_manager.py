@@ -4,7 +4,7 @@ from pymongo import ReturnDocument
 from datetime import datetime, timedelta
 
 
-class BannerDBManager:
+class BannerManager:
     def __init__(self, client, db):
         url = "mongodb://localhost:27017"
         self.client = motor.motor_asyncio.AsyncIOMotorClient(url)
@@ -57,7 +57,7 @@ class BannerDBManager:
     async def delete_banner(self, banner_id):
         await self.banners.delete_one({"_id": banner_id})
 
-    async def find_banners_by_criteria(self, tag_id, feature_id, use_last_revision=False):
+    async def find_banners(self, tag_id, feature_id, use_last_revision=False):
         query = {
             "tag_ids": tag_id,
             "feature_id": feature_id,
@@ -77,7 +77,13 @@ class BannerDBManager:
         return await self.banners.find(query).to_list(limit)
 
     async def find_all_versions_by_id(self, banner_id):
-        return await self.last_versions.find({"prev_id": banner_id}).to_list(None)
+        current_version = await self.banners.find_one({"_id": banner_id})
+        previous_versions = await self.last_versions.find({"prev_id": banner_id}).to_list(None)
+        if current_version is not None:
+            all_versions = [current_version] + previous_versions
+        else:
+            all_versions = previous_versions
+        return all_versions
 
     async def delete_banners_by_tag_or_feature(self, tag_id, feature_id):
         await self.banners.delete_many({
@@ -86,36 +92,4 @@ class BannerDBManager:
 
 
 if __name__ == "__main__":
-    db_manager = BannerDBManager("avito",
-                                   "banners")
-
-
-    async def demo_operations():
-        # Создание нескольких записей
-        ids = []
-        ids.append(await db_manager.create_banner([1, 2], 101,
-                                                  {'title': 'Title 1', 'text': 'Text 1', 'url': 'http://url1.com'},
-                                                  True))
-        ids.append(await db_manager.create_banner([3, 4], 102,
-                                                  {'title': 'Title 2', 'text': 'Text 2', 'url': 'http://url2.com'},
-                                                  True))
-
-        # Обновление записи
-        await db_manager.update_banner(ids[0], [5, 6], 103, {'title': 'Updated Title', 'text': 'Updated Text',
-                                                             'url': 'http://updatedurl.com'}, False)
-
-        # Получение всех версий по ID
-        versions = await db_manager.find_all_versions_by_id(ids[0])
-        print("Versions of first banner:", versions)
-
-        # Поиск записей по критериям
-        active_banners = await db_manager.find_banners_by_criteria(2, 101, False)
-        print("Active banners:", active_banners)
-
-        # Удаление записей по tag_id или feature_id
-        await db_manager.delete_banners_by_tag_or_feature(5, 103)
-
-
-    # Запуск демо
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(demo_operations())
+    pass
