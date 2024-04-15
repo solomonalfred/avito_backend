@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+Jinja2
+requests
+python-jose
+passlib[bcrypt]
+motor
+aiohttp
+sqlalchemy
+alembic
+asyncpg
+python-dotenv
+pymongo
