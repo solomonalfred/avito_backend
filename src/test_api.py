@@ -141,3 +141,23 @@ class TestDOCXTemplatePlaceholder(unittest.TestCase):
                  flag = False
                  break
          self.assertEqual(flag, True)
+
+
+     def test_delete_by_tag_or_feature(self):
+         url = f"{url_path}/access_token"
+         data = {
+             "username": "admin",
+             "password": "12345"
+         }
+         res = requests.post(url, data=data)
+         token = res.json()
+         headers = {'Authorization': f'Bearer {token["access_token"]}'}
+         params = {
+             'tag_id': random.randint(1, 100000),
+             'feature_id': random.randint(1, 1000),
+         }
+         url = f"{url_path}/banner"
+         resp = requests.delete(url, headers=headers, params=params)
+         result = resp.json()
+         self.assertEqual(result["description"], "Баннеры успешно удалены")
+

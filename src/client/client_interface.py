@@ -103,7 +103,7 @@ async def delete_banner(response: Response,
                         id: int,
                         token: Annotated[dict, Depends(get_current_user_api)]):
     try:
-        response.status_code = 204
+        response.status_code = 200
         if token["role"] != "admin":
             response.status_code = 403
             return JSONResponse(content={"description": "Пользователь не имеет доступа"})
@@ -119,13 +119,30 @@ async def banner_versions(response: Response,
                           id: int,
                           token: Annotated[dict, Depends(get_current_user_api)]):
     try:
-        response.status_code = 204
+        response.status_code = 200
         if token["role"] != "admin":
             response.status_code = 403
             return JSONResponse(content={"description": "Пользователь не имеет доступа"})
         resp = await banners.find_all_versions_by_id(id)
         resp = serialize_banners(resp)
         return JSONResponse(content=resp)
+    except:
+        response.status_code = 500
+        return JSONResponse(content={"description": "Внутренняя ошибка сервера"})
+
+
+@router.delete("/banner", summary="Удаление баннера по фиче и/или тэгу")
+async def delete_banners(response: Response,
+                         token: Annotated[dict, Depends(get_current_user_api)],
+                         tag_id: Optional[int] = Query(None),
+                         feature_id: Optional[int] = Query(None)):
+    try:
+        response.status_code = 200
+        if token["role"] != "admin":
+            response.status_code = 403
+            return JSONResponse(content={"description": "Пользователь не имеет доступа"})
+        resp = await banners.delete_banners_by_tag_or_feature(tag_id, feature_id)
+        return JSONResponse(content={"description": "Баннеры успешно удалены"})
     except:
         response.status_code = 500
         return JSONResponse(content={"description": "Внутренняя ошибка сервера"})
