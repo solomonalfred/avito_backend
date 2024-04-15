@@ -74,3 +74,61 @@ class TestDOCXTemplatePlaceholder(unittest.TestCase):
          self.assertTrue(len(response.json())>0)
 
 
+     def test_patch_banners(self):
+         url = f"{url_path}/access_token"
+         data = {
+             "username": "admin",
+             "password": "12345"
+         }
+         res = requests.post(url, data=data)
+         token = res.json()
+         headers = {'Authorization': f'Bearer {token["access_token"]}'}
+         flag = True
+         for i in range(10):
+             url = f"{url_path}/banner/{i}"
+             array_size = random.randint(1, 1000)
+             banner_data = {
+                 "tag_ids": [random.randint(1, 100000) for _ in range(array_size)],
+                 "feature_id": random.randint(1, 1000),
+                 "content": {
+                     "title": "Заголовок нового баннера",
+                     "text": "Описание нового баннера",
+                     "url": "http://example.com/image.png"
+                 },
+                 "is_active": False
+             }
+             resp = requests.patch(url, headers=headers, data=json.dumps(banner_data))
+             result =resp.json()
+             if result["description"] != "OK":
+                 flag = False
+                 break
+         self.assertEqual(flag, True)
+
+     def test_banners_versions(self):
+         url = f"{url_path}/access_token"
+         data = {
+             "username": "admin",
+             "password": "12345"
+         }
+         res = requests.post(url, data=data)
+         token = res.json()
+         headers = {'Authorization': f'Bearer {token["access_token"]}'}
+         flag = True
+         try:
+             for i in range(10):
+                 url = f"{url_path}/banner_versions/{i}"
+                 resp = requests.get(url, headers=headers)
+                 print(resp.json())
+         except:
+             flag = False
+         self.assertEqual(flag, True)
+
+     def test_delete_banners(self):
+         url = f"{url_path}/access_token"
+         data = {
+             "username": "admin",
+             "password": "12345"
+         }
+         res = requests.post(url, data=data)
+         token = res.json()
+         headers = {'Authorization': f'Bearer {token["access_token"]}'}
