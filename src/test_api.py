@@ -44,12 +44,23 @@ class TestDOCXTemplatePlaceholder(unittest.TestCase):
                          "text": "Описание нового баннера",
                          "url": "http://example.com/image.png"
                      },
-                     "is_active": True  # Статус активности баннера
+                     "is_active": True
                  }
                  requests.post(url, headers=headers, data=json.dumps(banner_data))
          except:
             flag = False
          self.assertEqual(flag, True)
 
-    def test
+     def test_get_banners(self):
+         url = f"{url_path}/access_token"
+         data = {
+             "username": "admin",
+             "password": "12345"
+         }
+         res = requests.post(url, data=data)
+         token = res.json()
+         token = token['']
+
+         headers = {'Authorization': f'Bearer {token["access_token"]}'}
+         url = f"{url_path}/banner"
 
