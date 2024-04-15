@@ -59,8 +59,18 @@ class TestDOCXTemplatePlaceholder(unittest.TestCase):
          }
          res = requests.post(url, data=data)
          token = res.json()
-         token = token['']
 
          headers = {'Authorization': f'Bearer {token["access_token"]}'}
          url = f"{url_path}/banner"
+
+         params = {
+             'tag_id': random.randint(1, 100000),
+             'feature_id': random.randint(1, 1000),
+             'limit': 10
+         }
+
+         response = requests.get(url, headers=headers, params=params)
+         print(response.json())
+         self.assertTrue(len(response.json())>0)
+
 
