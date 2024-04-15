@@ -112,3 +112,20 @@ async def delete_banner(response: Response,
     except:
         response.status_code = 500
         return JSONResponse(content={"description": "Внутренняя ошибка сервера"})
+
+
+@router.get("/banner_versions/{id}", summary="Просмотр версий баннеа")
+async def banner_versions(response: Response,
+                          id: int,
+                          token: Annotated[dict, Depends(get_current_user_api)]):
+    try:
+        response.status_code = 204
+        if token["role"] != "admin":
+            response.status_code = 403
+            return JSONResponse(content={"description": "Пользователь не имеет доступа"})
+        resp = await banners.find_all_versions_by_id(id)
+        resp = serialize_banners(resp)
+        return JSONResponse(content=resp)
+    except:
+        response.status_code = 500
+        return JSONResponse(content={"description": "Внутренняя ошибка сервера"})

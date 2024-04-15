@@ -7,7 +7,7 @@ def datetime_to_iso(dt):
 
 def serialize_banners(banners):
     return [{
-        '_id': banner['_id'],
+        '_id': banner['_id'] if isinstance(banner['_id'], int) else banner.get("prev_id"),
         'tag_ids': banner['tag_ids'],
         'feature_id': banner['feature_id'],
         'content': banner['content'],

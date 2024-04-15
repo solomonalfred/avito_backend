@@ -8,7 +8,7 @@ class BannerManager:
     def __init__(self, client, db):
         # server db URL: "mongodb://mongodb:27017"
         # test db URL: "mongodb://localhost:27017"
-        url = "mongodb://mongodb:27017"
+        url = "mongodb://localhost:27017"
         self.client = motor.motor_asyncio.AsyncIOMotorClient(url)
         self.db = self.client[client]
         self.banners = self.db[db]
@@ -80,7 +80,10 @@ class BannerManager:
         return await self.banners.find(query).to_list(limit)
 
     async def find_all_versions_by_id(self, banner_id):
-        current_version = await self.banners.find_one({"_id": banner_id})
+        try:
+            current_version = await self.banners.find_one({"_id": banner_id})
+        except:
+            return list()
         previous_versions = await self.last_versions.find({"prev_id": banner_id}).to_list(None)
         if current_version is not None:
             all_versions = [current_version] + previous_versions
