@@ -132,3 +132,12 @@ class TestDOCXTemplatePlaceholder(unittest.TestCase):
          res = requests.post(url, data=data)
          token = res.json()
          headers = {'Authorization': f'Bearer {token["access_token"]}'}
+         flag = True
+         for i in range(10):
+             url = f"{url_path}/banner/{i}"
+             resp = requests.delete(url, headers=headers)
+             result = resp.json()
+             if result["description"] != "Баннер успешно удален":
+                 flag = False
+                 break
+         self.assertEqual(flag, True)
