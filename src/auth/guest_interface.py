@@ -46,9 +46,10 @@ async def signup(
 @router.post("/access_token")
 async def token(
         response: Response,
-        username: str = Form(...),
-        password: str = Form(...)
+        form_data: OAuth2PasswordRequestForm = Depends()
 ):
+    username = form_data.username
+    password = form_data.password
     users = await authenticate_user(username, password)
     if not users:
         response.status_code = 401

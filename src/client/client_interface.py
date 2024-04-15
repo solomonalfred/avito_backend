@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, Query
 from fastapi.responses import Response, JSONResponse
-from typing import Annotated
+from typing import Annotated, Optional
 
 from src.dependencies.oauth2 import get_current_user_api
 from src.db.banners_manager import *
 from src.configuration import BANNER_USER, BANNER_NAME
 from src.client.json_data import *
+from src.modules.utils import *
 
 router = APIRouter(
     tags=["client"],
@@ -37,10 +38,10 @@ async def user_banner(response: Response,
 
 @router.get("/banner", summary="Получение всех баннеров c фильтрацией по фиче и/или тегу")
 async def banner(response: Response,
-                 tag_id: int,
-                 feature_id: int,
-                 limit: int,
-                 token: Annotated[dict, Depends(get_current_user_api)]):
+                 token: Annotated[dict, Depends(get_current_user_api)],
+                 tag_id: Optional[int] = Query(None),
+                 feature_id: Optional[int] = Query(None),
+                 limit: Optional[int] = Query(10)):
     try:
         response.status_code = 200
         if token["role"] != "admin":
@@ -50,8 +51,10 @@ async def banner(response: Response,
         if resp is not None and len(resp) == 0:
             response.status_code = 404
             return JSONResponse(content={"description": "Баннеры не найдены"})
+        resp = serialize_banners(resp)
         return JSONResponse(content=resp)
-    except:
+    except Exception as e:
+        # print(e)
         response.status_code = 500
         return JSONResponse(content={"description": "Внутренняя ошибка сервера"})
 
@@ -65,7 +68,7 @@ async def banner(response: Response,
         if token["role"] != "admin":
             response.status_code = 403
             return JSONResponse(content={"description": "Пользователь не имеет доступа"})
-        resp = banners.create_banner(banner.tag_ids,
+        resp = await banners.create_banner(banner.tag_ids,
                                      banner.feature_id,
                                      banner.content)
         return JSONResponse(content={"banner_id": resp})
