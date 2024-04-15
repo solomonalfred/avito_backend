@@ -41,6 +41,7 @@ class BannerManager:
         if old_banner:
             prev_version = old_banner.copy()
             prev_version['prev_id'] = old_banner['_id']
+            del prev_version["_id"]
             await self.last_versions.insert_one(prev_version)
 
         new_values = {

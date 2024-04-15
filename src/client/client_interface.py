@@ -87,7 +87,7 @@ async def patch_banner(response: Response,
         if token["role"] != "admin":
             response.status_code = 403
             return JSONResponse(content={"description": "Пользователь не имеет доступа"})
-        resp = banners.update_banner(id,
+        resp = await banners.update_banner(id,
                                          banner.tag_ids,
                                          banner.feature_id,
                                          banner.content,
