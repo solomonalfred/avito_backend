@@ -22,14 +22,14 @@ class BannerManager:
         )
         return sequence_document['sequence_value']
 
-    async def create_banner(self, tag_ids, feature_id, content, is_active):
+    async def create_banner(self, tag_ids, feature_id, content):
         banner_id = await self.get_next_sequence_value('banner_id')
         document = {
             "_id": banner_id,
             "tag_ids": tag_ids,
             "feature_id": feature_id,
             "content": content,
-            "is_active": is_active,
+            "is_active": True,
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
         }

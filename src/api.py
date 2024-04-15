@@ -1,8 +1,6 @@
 from uvicorn import Config, Server
 import asyncio
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 
 from src.db.guest_requests import *
 from src.dependencies.hasher import *
